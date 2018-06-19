@@ -22,8 +22,8 @@ echo
 libsodium_file="libsodium-1.0.16"
 libsodium_url="https://github.com/jedisct1/libsodium/releases/download/1.0.16/libsodium-1.0.16.tar.gz"
 
-shadowsocksr_file="shadowsocksr-3.2.1"
-shadowsocksr_url="https://github.com/shadowsocksrr/shadowsocksr/archive/3.2.1.tar.gz"
+shadowsocksr_file="shadowsocksr-3.2.2"
+shadowsocksr_url="https://github.com/shadowsocksrr/shadowsocksr/archive/3.2.2.tar.gz"
 
 
 #Current folder
@@ -105,34 +105,34 @@ check_sys(){
     if [[ -f /etc/redhat-release ]]; then
         release="centos"
         systemPackage="yum"
-    elif cat /etc/issue | grep -Eqi "debian"; then
+    elif grep -Eqi "debian" /etc/issue; then
         release="debian"
         systemPackage="apt"
-    elif cat /etc/issue | grep -Eqi "ubuntu"; then
+    elif grep -Eqi "ubuntu" /etc/issue; then
         release="ubuntu"
         systemPackage="apt"
-    elif cat /etc/issue | grep -Eqi "centos|red hat|redhat"; then
+    elif grep -Eqi "centos|red hat|redhat" /etc/issue; then
         release="centos"
         systemPackage="yum"
-    elif cat /proc/version | grep -Eqi "debian"; then
+    elif grep -Eqi "debian" /proc/version; then
         release="debian"
         systemPackage="apt"
-    elif cat /proc/version | grep -Eqi "ubuntu"; then
+    elif grep -Eqi "ubuntu" /proc/version; then
         release="ubuntu"
         systemPackage="apt"
-    elif cat /proc/version | grep -Eqi "centos|red hat|redhat"; then
+    elif grep -Eqi "centos|red hat|redhat" /proc/version; then
         release="centos"
         systemPackage="yum"
     fi
 
-    if [[ ${checkType} == "sysRelease" ]]; then
-        if [ "$value" == "$release" ]; then
+    if [[ "${checkType}" == "sysRelease" ]]; then
+        if [ "${value}" == "${release}" ]; then
             return 0
         else
             return 1
         fi
-    elif [[ ${checkType} == "packageManager" ]]; then
-        if [ "$value" == "$systemPackage" ]; then
+    elif [[ "${checkType}" == "packageManager" ]]; then
+        if [ "${value}" == "${systemPackage}" ]; then
             return 0
         else
             return 1

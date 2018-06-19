@@ -143,39 +143,69 @@ check_sys(){
     if [[ -f /etc/redhat-release ]]; then
         release="centos"
         systemPackage="yum"
-    elif cat /etc/issue | grep -Eqi "debian"; then
+    elif grep -Eqi "debian" /etc/issue; then
         release="debian"
         systemPackage="apt"
-    elif cat /etc/issue | grep -Eqi "ubuntu"; then
+    elif grep -Eqi "ubuntu" /etc/issue; then
         release="ubuntu"
         systemPackage="apt"
-    elif cat /etc/issue | grep -Eqi "centos|red hat|redhat"; then
+    elif grep -Eqi "centos|red hat|redhat" /etc/issue; then
         release="centos"
         systemPackage="yum"
-    elif cat /proc/version | grep -Eqi "debian"; then
+    elif grep -Eqi "debian" /proc/version; then
         release="debian"
         systemPackage="apt"
-    elif cat /proc/version | grep -Eqi "ubuntu"; then
+    elif grep -Eqi "ubuntu" /proc/version; then
         release="ubuntu"
         systemPackage="apt"
-    elif cat /proc/version | grep -Eqi "centos|red hat|redhat"; then
+    elif grep -Eqi "centos|red hat|redhat" /proc/version; then
         release="centos"
         systemPackage="yum"
     fi
 
-    if [[ ${checkType} == "sysRelease" ]]; then
-        if [ "$value" == "$release" ]; then
+    if [[ "${checkType}" == "sysRelease" ]]; then
+        if [ "${value}" == "${release}" ]; then
             return 0
         else
             return 1
         fi
-    elif [[ ${checkType} == "packageManager" ]]; then
-        if [ "$value" == "$systemPackage" ]; then
+    elif [[ "${checkType}" == "packageManager" ]]; then
+        if [ "${value}" == "${systemPackage}" ]; then
             return 0
         else
             return 1
         fi
     fi
+}
+
+version_gt(){
+    test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" != "$1"
+}
+
+check_kernel_version(){
+    local kernel_version=$(uname -r | cut -d- -f1)
+    if version_gt ${kernel_version} 3.7.0; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+check_kernel_headers(){
+    if check_sys packageManager yum; then
+        if rpm -qa | grep -q headers-$(uname -r); then
+            return 0
+        else
+            return 1
+        fi
+    elif check_sys packageManager apt; then
+        if dpkg -s linux-headers-$(uname -r) > /dev/null 2>&1; then
+            return 0
+        else
+            return 1
+        fi
+    fi
+    return 1
 }
 
 debianversion(){
@@ -291,14 +321,14 @@ pre_install(){
     apt-get -y --no-install-recommends install gettext build-essential autoconf automake libtool openssl libssl-dev zlib1g-dev libpcre3-dev libev-dev libc-ares-dev
 }
 
-download() {
+download(){
     local filename=${1}
     local cur_dir=`pwd`
     if [ -s ${filename} ]; then
         echo -e "[${green}Info${plain}] ${filename} [found]"
     else
         echo -e "[${green}Info${plain}] ${filename} not found, download now..."
-        wget --no-check-certificate -cq -t3 -T3 -O ${1} ${2}
+        wget --no-check-certificate -cq -t3 -T60 -O ${1} ${2}
         if [ $? -eq 0 ]; then
             echo -e "[${green}Info${plain}] ${filename} download completed..."
         else
@@ -318,7 +348,7 @@ download_files(){
     download "/etc/init.d/shadowsocks" "${init_script_link}"
 }
 
-install_libsodium() {
+install_libsodium(){
     if [ ! -f /usr/lib/libsodium.a ]; then
         cd ${cur_dir}
         tar zxf ${libsodium_file}.tar.gz
@@ -333,7 +363,7 @@ install_libsodium() {
     fi
 }
 
-install_mbedtls() {
+install_mbedtls(){
     if [ ! -f /usr/lib/libmbedtls.a ]; then
         cd ${cur_dir}
         tar xf ${mbedtls_file}-gpl.tgz
@@ -356,6 +386,12 @@ config_shadowsocks(){
         server_value="[\"[::0]\",\"0.0.0.0\"]"
     fi
 
+    if check_kernel_version && check_kernel_headers; then
+        fast_open="true"
+    else
+        fast_open="false"
+    fi
+
     if [ ! -d /etc/shadowsocks-libev ]; then
         mkdir -p /etc/shadowsocks-libev
     fi
@@ -363,11 +399,13 @@ config_shadowsocks(){
 {
     "server":${server_value},
     "server_port":${shadowsocksport},
-    "local_address":"127.0.0.1",
-    "local_port":1080,
     "password":"${shadowsockspwd}",
-    "timeout":600,
-    "method":"${shadowsockscipher}"
+    "timeout":300,
+    "user":"nobody",
+    "method":"${shadowsockscipher}",
+    "fast_open":${fast_open},
+    "nameserver":"8.8.8.8",
+    "mode":"tcp_and_udp"
 }
 EOF
 }

@@ -13,7 +13,7 @@
 #
 
 NAME=Shadowsocks-go
-BIN=/usr/bin/shadowsocks-server
+DAEMON=/usr/bin/shadowsocks-server
 if [ -f /etc/shadowsocks-go/config.json ]; then
     CONF=/etc/shadowsocks-go/config.json
 elif [ -f /etc/shadowsocks/config.json ]; then
@@ -23,12 +23,12 @@ PID_DIR=/var/run
 PID_FILE=$PID_DIR/shadowsocks-go.pid
 RET_VAL=0
 
-[ -x $BIN ] || exit 0
+[ -x $DAEMON ] || exit 0
 
 if [ ! -d $PID_DIR ]; then
     mkdir -p $PID_DIR
     if [ $? -ne 0 ]; then
-        echo "Creating PID directory $PID_DIR failed!"
+        echo "Creating PID directory $PID_DIR failed"
         exit 1
     fi
 fi
@@ -70,14 +70,14 @@ do_start() {
         echo "$NAME (pid $PID) is already running..."
         return 0
     fi
-    $BIN -c $CONF 2>&1 > /dev/null &
+    $DAEMON -c $CONF 2>&1 > /dev/null &
     PID=$!
     echo $PID > $PID_FILE
     sleep 0.3
     if check_running; then
-        echo "Starting $NAME success!"
+        echo "Starting $NAME success"
     else
-        echo "Starting $NAME failed!"
+        echo "Starting $NAME failed"
         RET_VAL=1
     fi
 }
@@ -86,7 +86,7 @@ do_stop() {
     if check_running; then
         kill -9 $PID
         rm -f $PID_FILE
-        echo "Stopping $NAME success!"
+        echo "Stopping $NAME success"
     else
         echo "$NAME is stopped"
         RET_VAL=1
@@ -95,6 +95,7 @@ do_stop() {
 
 do_restart() {
     do_stop
+    sleep 0.5
     do_start
 }
 

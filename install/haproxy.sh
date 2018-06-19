@@ -18,7 +18,7 @@ echo "# Install haproxy for Shadowsocks server                    #"
 echo "#############################################################"
 echo
 
-check_sys() {
+check_sys(){
     local checkType=$1
     local value=$2
 
@@ -63,7 +63,7 @@ check_sys() {
     fi
 }
 
-install_check() {
+install_check(){
     if check_sys packageManager yum || check_sys packageManager apt; then
         return 0
     else
