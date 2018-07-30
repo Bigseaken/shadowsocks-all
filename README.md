@@ -1,10 +1,4 @@
 
-
-### 所有版本集合安装
-
-这是本人从原有的脚本中重新整理出来的，去除原脚本里面有关作者站点下载连接。
-
-
 ### 特点
 
 一键安装 Shadowsocks-Python， ShadowsocksR， Shadowsocks-Go， Shadowsocks-libev 版（四选一）服务端
@@ -31,7 +25,7 @@ chmod +x shadowsocks-all.sh
 默认密码`abc123456`
 
 
-### 具体参考
+### 相关参考
 
 这是优化修改版，原作者版本请看[这里](https://github.com/teddysun/shadowsocks_install)
 
