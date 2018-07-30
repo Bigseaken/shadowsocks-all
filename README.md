@@ -33,13 +33,15 @@ chmod +x shadowsocks-all.sh
 
 ### 相关文章
 
-[Shadowsocks 一键安装脚本（四合一）](https://shadowsocks.be/11.html)
+[Shadowsocks 一键安装脚本（四合一）](https://teddysun.com/486.html)
 
 [ShadowsocksR一键安装脚本](https://shadowsocks.be/9.html)
 
-[Shadowsocks libev版一键安装脚本](https://shadowsocks.be/4.html)
+[Shadowsocks libev版一键安装脚本](https://teddysun.com/357.html)
 
-[Shadowsocks Go版一键安装脚本](https://shadowsocks.be/3.html)
+[shadowsocks-libev-debian版一键安装脚本](https://teddysun.com/358.html)
 
-[Shadowsocks Python版一键安装脚本](https://shadowsocks.be/1.html)
+[Shadowsocks Go版一键安装脚本](https://teddysun.com/392.html)
+
+[Shadowsocks Python版一键安装脚本](https://teddysun.com/342.html)
 
